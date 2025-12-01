@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <title>Moja PWA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- iOS ikone i podešavanja (opciono ali preporučeno) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+    <h1>Dobrodošli u PWA!</h1>
+    <button onclick="promeniPoruku()">Klikni me</button>
+
+    <script>
+        function promeniPoruku() {
+            document.querySelector('h1').innerText = "Poruka je promenjena!";
+        }
+
+        // Registracija Service Worker-a
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+            .then(() => console.log('Service Worker registrovan!'));
+        }
+    </script>
+</body>
+</html>
