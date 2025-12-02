@@ -1,32 +1,138 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Moja PWA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <meta charset="UTF-8">
+	<title>Moja PWA</title>
     <!-- Manifest -->
     <link rel="manifest" href="manifest.json">
-
     <!-- iOS ikone i podešavanja (opciono ali preporučeno) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <link rel="apple-touch-icon" href="icon.png">
+	<style>
+		body{font-family:Arial, sans-serif;text-align:center;margin-top:50px;}
+		button{padding:10px 20px;font-size:16px;}
+		/*Stil za desktop*/
+		body{font-size:18px;}
+		/*Stil za mobilne uređaje*/
+		@media(max-width:600px){
+		body{font-size:14px;}
+		button{width:40%;}
+        }
+	</style>
+    <style>
+        #myImage {
+            width: auto;
+            height: 100px;
+            margin-top: 10px;
+        }
+    </style>
+	<style>
+	#qrcode img,
+	#qrcode canvas {
+		display: block;
+		margin: 0 auto;
+	}
+	</style>
 </head>
 <body>
-    <h1>Dobrodošli u PWA!</h1>
+    <br>
+    <h1 id="poruka">Pozdrav, ovoj je web aplikacija za prijavu incidenata!</h1>
+    <!-- Početna slika -->
+    <img id="myImage" src="white_base.png">
+	<br>
+	<br>
     <button onclick="promeniPoruku()">Klikni me</button>
+	
+    <h2><br></h2>
+    <h2>Moja GPS Lokacija</h2>
+    <button onclick="getLocation()">Prikaži lokaciju</button>
+    <p id="output"></p>
+	<p><br></p>
+ 	
+    <h2><br></h2>    
+	<h2>Generisanje QR koda</h2>
+	<input type="text" id="text-input" placeholder="Unesi tekst ili URL link" style="width: 50%; padding: 10px; font-size:16px;"/>
+	<button onclick="generateQR()">Generiši QR kod</button>
+    <div id="qrcode" style="margin-top:40px;"></div>
 
+    <!--  JavaScript kod za promenu poruke -->
     <script>
         function promeniPoruku() {
-            document.querySelector('h1').innerText = "Poruka je promenjena!";
-        }
+            // Menja teks
+			document.querySelector('h1').innerText = "Poruka je promenjena! Ponovo učitaj stranicu!!!";
+            // Menja sliku
+            document.getElementById("myImage").src = "smiley_tongue.png";        }
 
         // Registracija Service Worker-a
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/service-worker.js')
+            navigator.serviceWorker.register('service-worker.js')
             .then(() => console.log('Service Worker registrovan!'));
         }
     </script>
+
+    <!--  JavaScript kod za preuzimanje GPS lokacije -->
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("output").innerHTML = "Geolokacija nije podržana.";
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            document.getElementById("output").innerHTML = 
+                `Latitude: ${lat} <br> Longitude: ${lon}`;
+        }
+
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Korisnik je odbio zahtev za lokaciju.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Informacija o lokaciji nije dostupna.");
+                    break;
+                case error.TIMEOUT:
+                    alert("Zahtev za lokaciju je istekao.");
+                    break;
+                default:
+                    alert("Nepoznata greška.");
+            }
+        }
+    </script>
+
+	<!-- QRCode.js biblioteka -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+	<script>
+		let qr;
+		function generateQR() {
+			const text = document.getElementById("text-input").value;
+
+			if (!text.trim()) {
+				alert("Unesite tekst ili URL link!");
+				return;
+			}
+
+			// Ako QR već postoji, obriši ga
+			if (qr) {
+				document.getElementById("qrcode").innerHTML = "";
+			}
+			qr = new QRCode(document.getElementById("qrcode"), {
+				text: text,
+				width: 256,
+				height: 256
+			});
+		}
+	</script>
+	<br>
+	<br>
+	<img src="primer_qr_koda.png" width="250" high="250">
+
 </body>
 </html>
